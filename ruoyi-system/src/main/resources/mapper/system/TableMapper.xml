@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TableMapper">
+
+    <insert id="addTable">
+     insert into t_table (
+     sid ,status,table_name,floor,area,specification
+     ) value (
+     #{shopId},0,#{tableName},#{floorId},#{areaId},#{speId}
+     )
+    </insert>
+
+    <select id="selectTable" resultType="com.ruoyi.system.domain.Table">
+        select t.id,t.table_name as tableName ,t.status,ts.specification as specificationName,population
+        from t_table t
+        left join
+        t_table_specification ts
+        on
+        t.specification=ts.id
+        <where>
+            t.sid=#{shopId}
+            <if test="floorId != null and floorId != -1">
+                and t.floor=#{floorId}
+            </if>
+            <if test="speId != null and speId != -1">
+                and t.specification=#{speId}
+            </if>
+            <if test="status != null and status != -1">
+                and t.status=#{status}
+            </if>
+            <if test="area != null and area != -1">
+                and t.area=#{area}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOrder" resultType="com.ruoyi.system.domain.Table">
+        select t.id,t.table_name as tableName ,t.status,sum(o.totalPrice) as price from t_table t
+            left join t_order o
+            on
+            t.id=o.tableId
+        where
+            t.sid=#{shopId}  and t.id=#{tableId}
+
+    </select>
+
+
+    <select id="selectFloor" resultType="com.ruoyi.system.domain.TableFloor">
+        select id,floor from t_table_floor where shopId=#{shopId}
+    </select>
+
+    <delete id="deleteTable">
+        delete  from t_table where sid=#{shopId} and id=#{tableId}
+    </delete>
+
+    <delete id="deleteFloor">
+        delete  from t_table_floor  where sid=#{shopId} and id=#{floorId}
+    </delete>
+
+    <update id="updateTableName">
+        update  t_table  set  table_name =#{tableName} where  sid=#{shopId} and  id=#{tableId}
+    </update>
+
+    <update id="updateFloorName">
+        update  t_table_floor  set  floor =#{floorName} where  shopId=#{shopId} and  id=#{floorId}
+    </update>
+
+    <update id="updateTableStatus">
+        update t_table set status=#{status}
+        <if test="population != null and population != -1">
+            ,population=#{population}
+        </if>
+        where sid=#{shopId} and id=#{tableId}
+    </update>
+
+    <update id="updateTableArea">
+        update  t_table  set  area=#{area} where  sid=#{shopId} and  id=#{tableId}
+    </update>
+
+    <insert id="increaseTable">
+     insert into t_table (
+     sid ,status,table_name
+     ) value (
+     #{shopId},0,#{tableName}
+     )
+    </insert>
+
+    <select id="getMaxId" resultType="java.lang.Integer">
+        select  MAX(CAST(table_name as SIGNED INTEGER))  from t_table where sid=#{shopId} and table_name regexp  '[0-9]'
+    </select>
+
+    <select id="getMaxFloorId" resultType="java.lang.Integer">
+        select  MAX(CAST(floor as SIGNED INTEGER))  from t_table_floor where sid=#{shopId} and floor regexp  '[0-9]'
+    </select>
+
+    <delete id="deleteByFloor">
+        delete  from  t_table where floor=#{floorId} and sid=#{shopId}
+    </delete>
+
+    <delete id="deleteBySpe">
+        delete  from  t_table where specification=#{speId} and sid=#{shopId}
+    </delete>
+
+    <delete id="deleteByArea">
+        delete  from  t_table where area=#{areaId} and sid=#{shopId}
+    </delete>
+
+    <insert id="addFloor">
+     insert into t_table_floor (
+     shopId ,floor
+     ) value (
+     #{shopId},#{floorName}
+     )
+    </insert>
+
+    <!--             规格                                 -->
+
+    <insert id="addSpecification">
+     insert into t_table_specification (
+     shopId,specification
+     ) value (
+     #{shopId},#{specification}
+     )
+    </insert>
+
+    <update id="updateSpecification">
+        update  t_table_specification  set  specification =#{specification} where  shopId=#{shopId} and  id=#{speId}
+    </update>
+
+    <select id="selectSpecification" resultType="com.ruoyi.system.domain.TableSpecification">
+        select  *  from t_table_specification where shopId=#{shopId}
+    </select>
+
+    <delete id="deleteSpecification">
+        delete  from  t_table_specification  where id=#{speId} and shopId=#{shopId}
+    </delete>
+
+    <select id="selectStatus" resultType="com.ruoyi.system.domain.TableStatus">
+        select  id,status from  t_table_status
+    </select>
+
+    <select id="select" resultType="com.ruoyi.system.domain.Table">
+        select * from FROM  t_table where sid=#{shopId}
+    </select>
+
+
+    <insert id="addArea">
+        insert  into t_table_area (
+        shopId,floor,area
+        )value (
+        #{shopId},#{floorId},#{area}
+        )
+    </insert>
+
+    <update id="updateArea">
+        update  t_table_area   set   area=#{area} where  shopId=#{shopId} and id=#{areaId}
+    </update>
+
+    <select id="selectArea" resultType="com.ruoyi.system.domain.TableArea">
+        select a.area,a.id from t_table_area t
+        left join
+        t_area a
+        on
+        a.id=t.area
+        <where>
+            shopId=#{shopId}
+            <if test="floorId != null and floorId != -1">
+                and floor=#{floorId}
+            </if>
+        </where>
+    </select>
+
+
+    <delete id="deleteArea">
+        delete  from  t_table_area  where  shopId=#{shopId} and id=#{areaId}
+    </delete>
+
+    <select id="selectListTable" resultType="com.ruoyi.system.domain.Table" parameterType="java.lang.Integer">
+    select*from
+    t_table
+    where sid=#{shopId}
+</select>
+
+</mapper> 

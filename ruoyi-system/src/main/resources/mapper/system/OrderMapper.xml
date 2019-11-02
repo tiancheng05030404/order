@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OrderMapper">
+    <select id="delectorder" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        delete from
+        t_order
+        where
+        orderId=#{orderId}
+    </select>
+
+    <select id="findAll"  resultType="com.ruoyi.system.domain.Order">
+        SELECT
+	    *
+		FROM
+			t_order
+			where sid=#{shopId}
+    </select>
+
+    <insert id="addNew"
+            useGeneratedKeys="true"
+            keyProperty="orderId">
+        INSERT INTO t_order (
+        sid,orderId,
+        <if test="openId != null">
+            openId,
+        </if>
+        dishId,
+        dishStatus,
+        status,isDelete,
+        dishName, dishImage,
+        dishPrice, number, totalPrice,tableId,remark
+        ) VALUES (
+        #{shopId},#{orderId},
+        <if test="openId != null">
+            #{openId},
+        </if>
+        #{dishId},
+        0,0,0,
+        #{dishName}, #{dishImage},
+        #{dishPrice},#{number}, #{totalPrice},#{tableId},#{remark}
+        )
+    </insert>
+
+    <update id="updateOrderTime">
+		update t_order set orderTime=#{orderTime} where  orderId=#{orderId} and sid=#{shopId}
+	</update>
+
+    <select id="selectByOrderId"
+            resultType="com.ruoyi.system.domain.Order">
+		SELECT
+	     orderId,dishId,dishName,dishImage,dishPrice,number,totalPrice,dishStatus
+		FROM
+			t_order
+		WHERE
+			orderId=#{orderId} and sid=#{shopId} and isDelete=0
+	</select>
+
+    <select id="selectDesc"
+            resultType="com.ruoyi.system.domain.Order">
+		SELECT
+	     orderId,dishId,dishName,dishImage,dishPrice,number,totalPrice
+		FROM
+			t_order
+		WHERE
+			openIdI=#{openId} and sid=#{shopId}  and isDelete=0 order by orderTime Desc
+	</select>
+
+    <select id="getList"
+            resultType="com.ruoyi.system.domain.Order">
+		SELECT
+	     orderId,dishId,dishName,dishImage,dishPrice,number,totalPrice
+		FROM
+			t_order
+		WHERE
+			status=1 and sid=#{shopId} and openId=#{openId} and isDelete=0
+	</select>
+
+
+    <delete id="deleteByTableId">
+		update   t_order set isDelete = 1  where tableId=#{tableId}  and sid=#{shopId}
+	</delete>
+
+    <update id="updateStatusAndPayTime">
+        UPDATE
+			t_order
+		SET
+			status=1,
+			payTime=#{payTime}
+		WHERE
+			orderId=#{orderId}  and sid=#{shopId}
+	</update>
+
+    <select id="dishHot" resultType="com.ruoyi.system.domain.Dish">
+        select dishName,sum(number) as number,dishPrice as price from t_order
+         where status=1 and sid=#{shopId}
+            and  to_days(payTime) = to_days(now())
+        group by payTime   order by sum(number) desc limit 0,3
+    </select>
+
+    <select id="dishHotWeek" resultType="com.ruoyi.system.domain.Dish">
+        select dishName,sum(number) as number,dishPrice as price from t_order where status=1 and sid=#{shopId}
+            and  YEARWEEK(date_format(payTime,'%Y-%m-%d'),1) = YEARWEEK(now(),1)
+        group by payTime   order by sum(number) desc limit 0,3
+    </select>
+
+    <select id="dishHotMonth" resultType="com.ruoyi.system.domain.Dish">
+        select dishName,sum(number) as number,dishPrice as price from t_order where status=1 and sid=#{shopId}
+            and DATE_FORMAT( payTime, '%Y-%m' ) = DATE_FORMAT( CURDATE( ) ,'%Y-%m' )
+      group by payTime    order by sum(number) desc limit 0,3
+    </select>
+
+    <select id="maxInCome" resultType="com.ruoyi.system.domain.Boss">
+        select sum(totalPrice) as price from t_order where status=1 and
+        sid=#{shopId}
+            and  to_days(payTime) = to_days(now())
+        order by sum(totalPrice) desc limit 0,1
+    </select>
+
+    <select id="maxInComeWeek" resultType="com.ruoyi.system.domain.Boss">
+        select sum(totalPrice) as price from t_order where status=1 and
+        sid=#{shopId}
+            and  YEARWEEK( date_format(  payTime,'%Y-%m-%d' ) ) = YEARWEEK( now() )
+        order by sum(totalPrice) desc limit 0,1
+    </select>
+
+    <select id="maxInComeMonth" resultType="com.ruoyi.system.domain.Boss">
+        select sum(totalPrice) as price from t_order where status=1 and
+        sid=#{shopId}
+            and DATE_FORMAT( payTime, '%Y-%m' ) = DATE_FORMAT( CURDATE( ) ,'%Y-%m' )
+        order by sum(totalPrice) desc limit 0,1
+    </select>
+
+    <update id="changeStatusByOrderId">
+		update  t_order set dishStatus=#{status}  where  orderId=#{orderId}  and sid=#{shopId}
+	</update>
+
+    <update id="changeStatusByOrderIdAndDishId">
+        update t_order set dishStatus=#{status}
+        where orderId=#{orderId} and sid=#{shopId} and dishId=#{dishId}
+    </update>
+
+    <update id="change0">
+        update t_order set totalPrice=0
+        where orderId=#{orderId} and sid=#{shopId} and dishId=#{dishId}
+    </update>
+
+    <select id="checkExist" resultType="java.lang.Integer">
+    select count(dishId) from t_order where  orderId=#{orderId} and sid=#{shopId} and dishId=#{dishId} and isDelete=0
+    </select>
+
+    <select id="getDishNumber" resultType="java.lang.Integer">
+    select number from t_order where  orderId=#{orderId} and sid=#{shopId} and dishId=#{dishId} and isDelete=0
+    </select>
+
+    <update id="updateNumber">
+        update t_order set number=#{number},totalPrice=#{totalPrice} where  orderId=#{orderId} and sid=#{shopId} and dishId=#{dishId} and isDelete=0
+    </update>
+
+    <select id="selectStatus" resultType="com.ruoyi.system.domain.Order">
+		SELECT
+		dishName,dishImage,dishStatus
+		FROM
+			t_order
+		WHERE
+			orderId=#{orderId} and sid=#{shopId}  and isDelete=0
+	</select>
+
+
+    <select id="selectByTableId"
+            resultType="com.ruoyi.system.domain.Order">
+		SELECT
+	     orderId,dishId,dishName,dishImage,dishPrice,number,totalPrice,dishStatus
+		FROM
+			t_order
+		WHERE
+			status != 1 and sid=#{shopId} and tableId=#{tableId}  and isDelete=0
+	</select>
+
+    <insert id="addDish"
+            useGeneratedKeys="true"
+            keyProperty="orderId">
+		INSERT INTO t_order (
+			sid,orderId,dishId,
+            status,dishStatus,isDelete,
+			dishName, dishImage,
+			dishPrice, number, totalPrice,tableId,orderTime
+		) VALUES (
+			#{shopId},#{orderId},#{dishId},
+			0,0,0,
+			#{dishName}, #{dishImage},
+			#{dishPrice},#{number}, #{totalPrice},#{tableId},#{orderTime}
+		)
+	</insert>
+
+    <select id="getOrderIdByTableId" resultType="java.lang.String">
+        select  distinct (orderId)  from t_order where isDelete=0 and status=0  and sid=#{shopId} and tableId=#{tableId}
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+

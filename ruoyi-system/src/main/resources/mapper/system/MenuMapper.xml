@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MenuMapper">
+
+    <!--    添加商家菜单-->
+    <insert id="addMenu">
+     insert into t_menu (
+     sid ,dishName,dishPrice,dishImage,dishType
+     ) value (
+     #{shopId},#{dishName},#{dishPrice},#{dishImage},#{typeId}
+     )
+    </insert>
+
+    <!--查询某一菜品-->
+    <select id="findDish" resultType="com.ruoyi.system.domain.Menu">
+        select * from t_menu
+        where id=#{dishId}
+    </select>
+
+<!--    修改菜单信息-->
+    <update id="updateMenu">
+        update t_menu set dishName=#{dishName},dishPrice=#{dishPrice},dishImage=#{dishImage},dishType=#{dishType}  where sid=#{shopId} and id=#{id}
+    </update>
+
+    <!--    删除菜单信息-->
+    <update id="deleteMenu">
+        delete  from t_menu  where id=#{id}
+    </update>
+
+   <!-- 查询所有菜品信息-->
+    <select id="findAll" resultType="com.ruoyi.system.domain.Menu">
+        select * from t_menu where sid=#{shopId}
+    </select>
+
+    <!--    以分类Id查找商家的菜单-->
+    <select id="select" resultType="com.ruoyi.system.domain.Menu">
+        select id,dishName,dishPrice,dishImage from t_menu where sid=#{shopId} and dishType=#{dishType}
+    </select>
+
+    <!--    以分类Id查找商家的菜单-->
+    <select id="selectAll" resultType="com.ruoyi.system.domain.Menu">
+        select m.id,m.dishName,m.dishPrice,m.dishImage,md.dishType as dishTypeName from t_menu m    left  join  t_menu_dishType md  on  m.dishType=md.id  where m.sid=#{shopId}  and m.dishType=#{typeId}
+    </select>
+
+    <!-- 添加菜品分类-->
+    <insert id="addDishType">
+     insert into t_menu_dishType (
+     sid ,dishType
+     ) value (
+     #{shopId},#{dishType}
+     )
+    </insert>
+
+    <!--   查看商家的全部分类 -->
+    <select id="getDishType" resultType="com.ruoyi.system.domain.DishType">
+        select  id,dishType from t_menu_dishType where sid=#{shopId}
+    </select>
+
+    <update id="updateDishType">
+        update  t_menu_dishType  set dishType=#{typeName} where sid=#{shopId} and id=#{typeId}
+    </update>
+    <!--    删除商家的分类-->
+    <delete id="deleteDishType">
+        delete  from t_menu_dishType where  sid=#{shopId} and id=#{typeId}
+    </delete>
+
+    <!--    删除商家的所有分类-->
+    <delete id="deleteDishTypeAll">
+        delete  from t_menu_dishType where  sid=#{shopId}
+    </delete>
+
+
+</mapper> 

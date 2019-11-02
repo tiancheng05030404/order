@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FeedBackMapper">
+
+    <insert id="add">
+	insert into t_feedback(shopId,openId,remark)value (#{shopId},#{openId},#{remark})
+    </insert>
+
+    <select id="select" resultType="com.ruoyi.system.domain.FeedBack">
+        select remark from t_feedback  where  shopId=#{shopId} and openId=#{openId};
+    </select>
+
+    <update id="update">
+        update  t_feedback set  remark=#{remark}  where  shopId=#{shopId} and openId=#{openId};
+    </update>
+
+    <delete id="delete">
+        delete  from  t_feedback where shopId=#{shopId} and openId=#{openId};
+    </delete>
+</mapper>
+
+
+
+
+
+
+
+

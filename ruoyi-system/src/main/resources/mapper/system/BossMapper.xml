@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.BossMapper">
+
+    <select id="getEnaringToday" resultType="java.lang.Double">
+		select sum(totalPrice) from t_order
+		where
+		status=1  and  sid=#{shopId}
+		and  to_days(payTime) = to_days(now())
+-- 		GROUP BY sid DESC
+	</select>
+
+    <select id="getEnaringMonth" resultType="java.lang.Double">
+		select sum(totalPrice) from t_order
+		where status=1 and  sid=#{shopId}
+		and   DATE_FORMAT( payTime, '%Y%m' ) = DATE_FORMAT( CURDATE( ) ,'%Y%m' )
+	</select>
+
+    <select id="getEnaringWeek" resultType="java.lang.Double">
+		select sum(totalPrice) from t_order
+		where status=1 and  sid=#{shopId}
+			and  YEARWEEK( date_format(  payTime,'%Y-%m-%d' ) ) = YEARWEEK( now() )
+	</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
